@@ -19,8 +19,8 @@
 
 import { OnlineStatusSvg } from 'online-status-svg';
 import { Status } from '../models/status.js';
-import { StatusColors } from '../models/status.js';
-import { StatusLabels } from '../models/status.js';
+import { StatusColors, StatusLabels } from '../models/status.js';
+import { handleCors } from '../middlewares/cors.js';
 
 function renderBadge(label, color) {
   const status = new OnlineStatusSvg({
@@ -36,7 +36,15 @@ function renderEmpty() {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0"></svg>`;
 }
 
-export async function getStatusSvg(env) {
+export async function getStatusSvg(env, request) {
+  const cors = handleCors(request);
+
+  if (cors instanceof Response) {
+    return cors;
+  }
+
+  const headers = cors;
+
   let svg;
   try {
     const status = await env.STATUSDOT_KV.get("status");
@@ -51,11 +59,11 @@ export async function getStatusSvg(env) {
     svg = renderEmpty();
   }
 
+  headers.set("Content-Type", "image/svg+xml");
+  headers.set("Cache-Control", "no-cache");
+
   return new Response(svg, {
     status: 200,
-    headers: {
-      "Content-Type": "image/svg+xml",
-      "Cache-Control": "no-cache"
-    },
+    headers: headers,
   });
 }

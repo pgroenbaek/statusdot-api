@@ -19,26 +19,46 @@
 
 import { STATUS_EXPIRATION_SECONDS } from '../models/status.js';
 import { validateStatusPayload } from '../utils/validators.js';
+import { handleCors } from '../middlewares/cors.js';
 
 export async function setStatus(env, request) {
+  const cors = handleCors(request);
+
+  if (cors instanceof Response) {
+    return cors;
+  }
+
+  const headers = cors;
+
   try {
     const payload = await request.json();
 
     const { valid, error } = validateStatusPayload(payload);
     if (!valid) {
-      return new Response(JSON.stringify({ error }), { status: 400, headers: { "Content-Type": "application/json" } });
+      headers.set("Content-Type", "application/json");
+
+      return new Response(JSON.stringify({ error }), {
+        status: 400,
+        headers: headers
+      });
     }
 
-    await env.STATUSDOT_KV.put("status", payload.status, { expirationTtl: STATUS_EXPIRATION_SECONDS });
+    await env.STATUSDOT_KV.put("status", payload.status, {
+      expirationTtl: STATUS_EXPIRATION_SECONDS
+    });
+
+    headers.set("Content-Type", "application/json");
 
     return new Response(JSON.stringify({ success: true, status: payload.status }), {
       status: 200,
-      headers: { "Content-Type": "application/json" },
+      headers: headers,
     });
   } catch (err) {
+    headers.set("Content-Type", "application/json");
+
     return new Response(JSON.stringify({ error: 'Invalid JSON or server error' }), {
       status: 400,
-      headers: { "Content-Type": "application/json" },
+      headers: headers,
     });
   }
 }

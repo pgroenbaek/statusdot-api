@@ -29,7 +29,7 @@ export async function handleRequest(request, env) {
   switch (path) {
     case '/api/status':
       if (request.method === 'GET') {
-        return getStatus(env);
+        return getStatus(env, request);
       }
       if (request.method === 'POST') {
         const authError = requireApiKey(request, env);
@@ -42,7 +42,7 @@ export async function handleRequest(request, env) {
 
     case '/api/status.svg':
       if (request.method === 'GET') {
-        return getStatusSvg(env);
+        return getStatusSvg(env, request);
       }
       break;
 
