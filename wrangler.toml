@@ -1,10 +1,8 @@
 name = "statusdot-api"
-type = "javascript"
 compatibility_date = "2026-01-01"
+compatibility_flags = ["nodejs_compat"]
+main = "src/index.js"
 
 [[kv_namespaces]]
-binding = "statusdot-kv"
-title = "StatusDot KV"
-
-[vars]
-API_KEY = ""
+id = ""
+binding = "STATUSDOT_KV"

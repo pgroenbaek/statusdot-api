@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+export const STATUS_EXPIRATION_SECONDS = 5 * 60;
+
 export const Status = Object.freeze({
   OFFLINE: 0,
   ONLINE: 1,
@@ -29,4 +31,11 @@ export const StatusColors = Object.freeze({
   [Status.ONLINE]: "#00FF00",
   [Status.AWAY]: "#FFA500",
   [Status.BUSY]: "#FF0000",
+});
+
+export const StatusLabels = Object.freeze({
+  [Status.OFFLINE]: "OFFLINE",
+  [Status.ONLINE]: "ONLINE",
+  [Status.AWAY]: "AWAY",
+  [Status.BUSY]: "BUSY",
 });

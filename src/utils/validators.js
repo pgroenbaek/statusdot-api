@@ -17,9 +17,17 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-export function validateValuePayload(payload) {
-  if (!payload || typeof payload.value !== 'string') {
-    return { valid: false, error: 'Payload must be JSON with a string "value" property' };
+import { Status } from '../models/status.js';
+
+export function validateStatusPayload(payload) {
+  if (!payload || typeof payload.status !== 'number') {
+    return { valid: false, error: 'Payload must be JSON with a numeric "status" property' };
   }
+
+  const validValues = Object.values(Status);
+  if (!validValues.includes(payload.status)) {
+    return { valid: false, error: `Invalid status value. Must be one of: ${validValues.join(", ")}` };
+  }
+
   return { valid: true };
 }

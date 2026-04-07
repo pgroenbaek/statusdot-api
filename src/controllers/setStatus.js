@@ -17,20 +17,21 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { validateValuePayload } from '../utils/validators.js';
+import { STATUS_EXPIRATION_SECONDS } from '../models/status.js';
+import { validateStatusPayload } from '../utils/validators.js';
 
 export async function setStatus(env, request) {
   try {
     const payload = await request.json();
-    const { valid, error } = validateValuePayload(payload);
+
+    const { valid, error } = validateStatusPayload(payload);
     if (!valid) {
       return new Response(JSON.stringify({ error }), { status: 400, headers: { "Content-Type": "application/json" } });
     }
 
-    const formattedValue = _.toUpper(payload.value);
-    await env.MY_KV.put("status", formattedValue);
+    await env.STATUSDOT_KV.put("status", payload.status, { expirationTtl: STATUS_EXPIRATION_SECONDS });
 
-    return new Response(JSON.stringify({ success: true, value: formattedValue }), {
+    return new Response(JSON.stringify({ success: true, status: payload.status }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });

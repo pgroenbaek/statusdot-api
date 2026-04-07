@@ -17,10 +17,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { Status } from '../models/status.js';
+
 export async function getStatus(env) {
   try {
-    const value = await env.MY_KV.get("status");
-    return new Response(JSON.stringify({ value: value || null }), {
+    const status = await env.STATUSDOT_KV.get("status");
+
+    const result = status === null ? Status.OFFLINE : Number(status);
+
+    return new Response(JSON.stringify({ status: result }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
