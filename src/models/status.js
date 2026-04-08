@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-export const STATUS_EXPIRATION_SECONDS = 5 * 60;
+export const DEFAULT_STATUS_EXPIRATION_SECONDS = 5 * 60;
 
 export const Status = Object.freeze({
   OFFLINE: 0,

@@ -20,13 +20,22 @@
 import { Status } from '../models/status.js';
 
 export function validateStatusPayload(payload) {
+  if (!payload) {
+    return { valid: false, error: 'Payload must be JSON' };
+  }
+
   if (!payload || typeof payload.status !== 'number') {
     return { valid: false, error: 'Payload must be JSON with a numeric "status" property' };
   }
 
-  const validValues = Object.values(Status);
-  if (!validValues.includes(payload.status)) {
-    return { valid: false, error: `Invalid status value. Must be one of: ${validValues.join(", ")}` };
+  const validStatuses = Object.values(Status);
+  if (!validStatuses.includes(payload.status)) {
+    return { valid: false, error: `Invalid status value. Must be one of: ${validStatuses.join(", ")}` };
+  }
+
+
+  if ('expirationTtl' in payload && typeof payload.expirationTtl !== 'number') {
+    return { valid: false, error: '"expirationTtl" must be a number if provided' };
   }
 
   return { valid: true };

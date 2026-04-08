@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { STATUS_EXPIRATION_SECONDS } from '../models/status.js';
+import { DEFAULT_STATUS_EXPIRATION_SECONDS } from '../models/status.js';
 import { validateStatusPayload } from '../utils/validators.js';
 
 export async function setStatus(env, request, responseHeaders) {
@@ -34,8 +34,10 @@ export async function setStatus(env, request, responseHeaders) {
       });
     }
 
+    const expirationTtl = payload.expirationTtl ?? DEFAULT_STATUS_EXPIRATION_SECONDS;
+
     await env.STATUSDOT_KV.put("status", payload.status, {
-      expirationTtl: STATUS_EXPIRATION_SECONDS
+      expirationTtl: expirationTtl
     });
 
     responseHeaders.set("Content-Type", "application/json");
