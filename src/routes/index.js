@@ -27,7 +27,7 @@ export async function handleRequest(request, env) {
   const url = new URL(request.url);
   const path = url.pathname;
 
-  const cors = handleCors(request);
+  const cors = handleCors(env, request);
   
   if (cors instanceof Response) {
     return cors;

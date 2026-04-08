@@ -17,28 +17,26 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const allowedOrigins = [
-  '*'
-]
+export function handleCors(env, request) {
+  const origin = request.headers.get('Origin');
+  const headers = new Headers();
 
-export function handleCors(request) {
-  const origin = request.headers.get('Origin')
-  const headers = new Headers()
+  const allowedOrigins = env.ALLOWED_CORS_ORIGINS
 
-  if (allowedOrigins.includes(origin)) {
-    headers.set('Access-Control-Allow-Origin', origin)
-    headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-    headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-api-key')
+  if (allowedOrigins.includes('*')) {
+    headers.set('Access-Control-Allow-Origin', '*');
+    headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-api-key');
   }
-  else if (allowedOrigins.includes('*')) {
-    headers.set('Access-Control-Allow-Origin', '*')
-    headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-    headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-api-key')
+  else if (allowedOrigins.includes(origin)) {
+    headers.set('Access-Control-Allow-Origin', origin);
+    headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-api-key');
   }
 
   if (request.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers })
+    return new Response(null, { status: 204, headers });
   }
 
-  return headers
+  return headers;
 }

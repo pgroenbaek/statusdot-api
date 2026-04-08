@@ -6,3 +6,8 @@ main = "src/index.js"
 [[kv_namespaces]]
 id = ""
 binding = "STATUSDOT_KV"
+
+[vars]
+ALLOWED_CORS_ORIGINS = [
+  "*"
+]
