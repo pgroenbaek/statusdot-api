@@ -24,8 +24,8 @@ export function validateStatusPayload(payload) {
     return { valid: false, error: 'Payload must be JSON' };
   }
 
-  if (!payload || typeof payload.status !== 'number') {
-    return { valid: false, error: 'Payload must be JSON with a numeric "status" property' };
+  if (typeof payload.status !== 'number') {
+    return { valid: false, error: 'The "status" property must be a number' };
   }
 
   const validStatuses = Object.values(Status);
@@ -33,9 +33,13 @@ export function validateStatusPayload(payload) {
     return { valid: false, error: `Invalid status value. Must be one of: ${validStatuses.join(", ")}` };
   }
 
-
-  if ('expirationTtl' in payload && typeof payload.expirationTtl !== 'number') {
-    return { valid: false, error: '"expirationTtl" must be a number if provided' };
+  if ('expirationTtl' in payload) {
+    if (typeof payload.expirationTtl !== 'number') {
+      return { valid: false, error: 'The "expirationTtl" property must be a number if provided' };
+    }
+    if (payload.expirationTtl < 60) {
+      return { valid: false, error: 'The "expirationTtl" property must be greater than 59 seconds if provided' };
+    }
   }
 
   return { valid: true };
