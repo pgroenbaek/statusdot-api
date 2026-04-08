@@ -18,34 +18,25 @@
  */
 
 import { Status } from '../models/status.js';
-import { handleCors } from '../middlewares/cors.js';
 
-export async function getStatus(env, request) {
-  const cors = handleCors(request);
-
-  if (cors instanceof Response) {
-    return cors;
-  }
-
-  const headers = cors;
-
+export async function getStatus(env, request, responseHeaders) {
   try {
     const status = await env.STATUSDOT_KV.get("status");
 
     const result = status === null ? Status.OFFLINE : Number(status);
 
-    headers.set("Content-Type", "application/json");
+    responseHeaders.set("Content-Type", "application/json");
 
     return new Response(JSON.stringify({ status: result }), {
       status: 200,
-      headers: headers,
+      headers: responseHeaders,
     });
   } catch (err) {
-    headers.set("Content-Type", "application/json");
+    responseHeaders.set("Content-Type", "application/json");
 
     return new Response(JSON.stringify({ error: 'Failed to get value' }), {
       status: 500,
-      headers: headers,
+      headers: responseHeaders,
     });
   }
 }

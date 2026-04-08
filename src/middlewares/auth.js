@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-export function requireApiKey(request, env) {
+export function requireApiKey(env, request) {
   const apiKey = request.headers.get("x-api-key");
   const expectedKey = env.API_KEY;
 

@@ -21,28 +21,37 @@ import { getStatus } from '../controllers/getStatus.js';
 import { getStatusSvg } from '../controllers/getStatusSvg.js';
 import { setStatus } from '../controllers/setStatus.js';
 import { requireApiKey } from '../middlewares/auth.js';
+import { handleCors } from '../middlewares/cors.js';
 
 export async function handleRequest(request, env) {
   const url = new URL(request.url);
   const path = url.pathname;
 
+  const cors = handleCors(request);
+  
+  if (cors instanceof Response) {
+    return cors;
+  }
+
+  const responseHeaders = cors;
+
   switch (path) {
     case '/api/status':
       if (request.method === 'GET') {
-        return getStatus(env, request);
+        return getStatus(env, request, responseHeaders);
       }
       if (request.method === 'POST') {
-        const authError = requireApiKey(request, env);
+        const authError = requireApiKey(env, request);
         if (authError) {
             return authError;
         }
-        return setStatus(env, request);
+        return setStatus(env, request, responseHeaders);
       }
       break;
 
     case '/api/status.svg':
       if (request.method === 'GET') {
-        return getStatusSvg(env, request);
+        return getStatusSvg(env, request, responseHeaders);
       }
       break;
 

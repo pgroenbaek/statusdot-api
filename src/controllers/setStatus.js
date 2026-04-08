@@ -19,27 +19,18 @@
 
 import { STATUS_EXPIRATION_SECONDS } from '../models/status.js';
 import { validateStatusPayload } from '../utils/validators.js';
-import { handleCors } from '../middlewares/cors.js';
 
-export async function setStatus(env, request) {
-  const cors = handleCors(request);
-
-  if (cors instanceof Response) {
-    return cors;
-  }
-
-  const headers = cors;
-
+export async function setStatus(env, request, responseHeaders) {
   try {
     const payload = await request.json();
 
     const { valid, error } = validateStatusPayload(payload);
     if (!valid) {
-      headers.set("Content-Type", "application/json");
+      responseHeaders.set("Content-Type", "application/json");
 
       return new Response(JSON.stringify({ error }), {
         status: 400,
-        headers: headers
+        headers: responseHeaders
       });
     }
 
@@ -47,18 +38,18 @@ export async function setStatus(env, request) {
       expirationTtl: STATUS_EXPIRATION_SECONDS
     });
 
-    headers.set("Content-Type", "application/json");
+    responseHeaders.set("Content-Type", "application/json");
 
     return new Response(JSON.stringify({ success: true, status: payload.status }), {
       status: 200,
-      headers: headers,
+      headers: responseHeaders,
     });
   } catch (err) {
-    headers.set("Content-Type", "application/json");
+    responseHeaders.set("Content-Type", "application/json");
 
     return new Response(JSON.stringify({ error: 'Invalid JSON or server error' }), {
       status: 400,
-      headers: headers,
+      headers: responseHeaders,
     });
   }
 }
