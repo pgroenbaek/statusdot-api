@@ -17,39 +17,44 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { STATUS_EXPIRATION_SECONDS } from '../models/status.js';
-import { validateStatusPayload } from '../utils/validators.js';
+import { OnlineStatusSvg } from 'online-status-svg';
+import { Status } from '../models/status.js';
+import { StatusColors, StatusLabels } from '../models/status.js';
 
-export async function setStatus(env, request, responseHeaders) {
+function renderBadge(label, color) {
+  const status = new OnlineStatusSvg({
+    textColor: "#eeeeee",
+    dotColor: color,
+    statusText: label,
+  });
+  
+  return status.render();
+}
+
+function renderEmpty() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0"></svg>`;
+}
+
+export async function getStatusSvg(env, request, responseHeaders) {
+  let svg;
   try {
-    const payload = await request.json();
+    const status = await env.STATUSDOT_KV.get("status");
 
-    const { valid, error } = validateStatusPayload(payload);
-    if (!valid) {
-      responseHeaders.set("Content-Type", "application/json");
+    const result = status === null ? Status.OFFLINE : Number(status);
 
-      return new Response(JSON.stringify({ error }), {
-        status: 400,
-        headers: responseHeaders
-      });
-    }
+    const label = StatusLabels[result]
+    const color = StatusColors[result]
 
-    await env.STATUSDOT_KV.put("status", payload.status, {
-      expirationTtl: STATUS_EXPIRATION_SECONDS
-    });
-
-    responseHeaders.set("Content-Type", "application/json");
-
-    return new Response(JSON.stringify({ success: true, status: payload.status }), {
-      status: 200,
-      headers: responseHeaders,
-    });
-  } catch (err) {
-    responseHeaders.set("Content-Type", "application/json");
-
-    return new Response(JSON.stringify({ error: 'Invalid JSON or server error' }), {
-      status: 400,
-      headers: responseHeaders,
-    });
+    svg = renderBadge(label, color);
+  } catch {
+    svg = renderEmpty();
   }
+
+  responseHeaders.set("Content-Type", "image/svg+xml");
+  responseHeaders.set("Cache-Control", "no-cache");
+
+  return new Response(svg, {
+    status: 200,
+    headers: responseHeaders,
+  });
 }
