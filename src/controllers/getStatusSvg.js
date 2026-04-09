@@ -62,7 +62,10 @@ export async function getStatusSvg(env, request, responseHeaders) {
   }
 
   responseHeaders.set("Content-Type", "image/svg+xml");
-  responseHeaders.set("Cache-Control", "no-cache");
+  responseHeaders.set(
+    "Cache-Control",
+    "public, max-age=300, s-maxage=300, stale-while-revalidate=60"
+  );
 
   return new Response(svg, {
     status: 200,

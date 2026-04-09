@@ -26,6 +26,10 @@ export async function getStatus(env, request, responseHeaders) {
     const result = status === null ? Status.OFFLINE : Number(status);
 
     responseHeaders.set("Content-Type", "application/json");
+    responseHeaders.set(
+      "Cache-Control",
+      "public, max-age=300, s-maxage=300, stale-while-revalidate=60"
+    );
 
     return new Response(JSON.stringify({ status: result }), {
       status: 200,
