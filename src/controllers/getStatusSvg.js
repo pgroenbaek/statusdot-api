@@ -20,16 +20,7 @@
 import { OnlineStatusSvg } from 'online-status-svg';
 import { Status } from '../models/status.js';
 import { StatusColors, StatusLabels } from '../models/status.js';
-
-function renderBadge(label, color) {
-  const status = new OnlineStatusSvg({
-    textColor: "#eeeeee",
-    dotColor: color,
-    statusText: label,
-  });
-  
-  return status.render();
-}
+import { validateStatusSvgQuery } from '../utils/validators.js';
 
 function renderEmpty() {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0"></svg>`;
@@ -38,6 +29,20 @@ function renderEmpty() {
 export async function getStatusSvg(env, request, responseHeaders) {
   let svg;
   try {
+
+    const url = new URL(request.url);
+
+    const { valid, error, options = {} } = validateStatusSvgQuery(url.searchParams);
+
+    if (!valid) {
+      responseHeaders.set("Content-Type", "application/json");
+
+      return new Response(JSON.stringify({ error }), {
+        status: 400,
+        headers: responseHeaders
+      });
+    }
+
     const status = await env.STATUSDOT_KV.get("status");
 
     const result = status === null ? Status.OFFLINE : Number(status);
@@ -45,7 +50,13 @@ export async function getStatusSvg(env, request, responseHeaders) {
     const label = StatusLabels[result]
     const color = StatusColors[result]
 
-    svg = renderBadge(label, color);
+    const statusSvg = new OnlineStatusSvg({
+      statusText: label,
+      dotColor: color,
+      ...options
+    });
+
+    svg = statusSvg.render();
   } catch {
     svg = renderEmpty();
   }

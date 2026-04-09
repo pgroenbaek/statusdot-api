@@ -21,7 +21,7 @@ export function handleCors(env, request) {
   const origin = request.headers.get('Origin');
   const headers = new Headers();
 
-  const allowedOrigins = env.ALLOWED_CORS_ORIGINS
+  const allowedOrigins = env.ALLOWED_CORS_ORIGINS;
 
   if (allowedOrigins.includes('*')) {
     headers.set('Access-Control-Allow-Origin', '*');
