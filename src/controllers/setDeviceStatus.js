@@ -20,7 +20,7 @@
 import { DEFAULT_STATUS_EXPIRATION_SECONDS } from '../models/status.js';
 import { validateStatusPayload } from '../utils/validators.js';
 
-export async function setStatus(env, request, responseHeaders) {
+export async function setDeviceStatus(env, request, responseHeaders, device) {
   try {
     const payload = await request.json();
 
@@ -35,21 +35,36 @@ export async function setStatus(env, request, responseHeaders) {
     }
 
     const expirationTtl = payload.expirationTtl ?? DEFAULT_STATUS_EXPIRATION_SECONDS;
+    const key = `status:${device}`;
 
-    await env.STATUSDOT_KV.put("status", payload.status, {
-      expirationTtl: expirationTtl
+    const status = Number(payload.status);
+
+    const keyContent = {
+      s: status,
+      u: Date.now()
+    };
+
+    await env.STATUSDOT_KV.put(key, JSON.stringify(keyContent), {
+      expirationTtl
     });
 
     responseHeaders.set("Content-Type", "application/json");
 
-    return new Response(JSON.stringify({ success: true, status: payload.status }), {
+    return new Response(JSON.stringify({
+      success: true,
+      device,
+      status
+    }), {
       status: 200,
       headers: responseHeaders,
     });
+
   } catch (err) {
     responseHeaders.set("Content-Type", "application/json");
 
-    return new Response(JSON.stringify({ error: 'Invalid JSON or server error' }), {
+    return new Response(JSON.stringify({
+      error: 'Invalid JSON or server error'
+    }), {
       status: 400,
       headers: responseHeaders,
     });

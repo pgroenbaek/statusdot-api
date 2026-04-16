@@ -19,11 +19,41 @@
 
 import { Status } from '../models/status.js';
 
+function resolveGlobalStatus(devices) {
+  let globalStatus = Status.OFFLINE;
+
+  for (const device of devices) {
+    const status = device?.s;
+
+    if (status === Status.ONLINE) {
+      return Status.ONLINE;
+    }
+    if (status === Status.AWAY) {
+      globalStatus = Status.AWAY;
+    }
+  }
+
+  return globalStatus;
+}
+
 export async function getStatus(env, request, responseHeaders) {
   try {
-    const status = await env.STATUSDOT_KV.get("status");
+    const list = await env.STATUSDOT_KV.list({ prefix: "status:" });
 
-    const result = status === null ? Status.OFFLINE : Number(status);
+    const devices = [];
+
+    for (const key of list.keys) {
+      const keyContent = await env.STATUSDOT_KV.get(key.name);
+      if (!keyContent) {
+        continue;
+      }
+
+      devices.push(JSON.parse(keyContent));
+    }
+
+    const result = devices.length === 0
+      ? Status.OFFLINE
+      : resolveGlobalStatus(devices);
 
     responseHeaders.set("Content-Type", "application/json");
     responseHeaders.set(
@@ -31,14 +61,19 @@ export async function getStatus(env, request, responseHeaders) {
       "public, max-age=300, s-maxage=300, stale-while-revalidate=60"
     );
 
-    return new Response(JSON.stringify({ status: result }), {
+    return new Response(JSON.stringify({
+      status: result
+    }), {
       status: 200,
       headers: responseHeaders,
     });
+
   } catch (err) {
     responseHeaders.set("Content-Type", "application/json");
 
-    return new Response(JSON.stringify({ error: 'Failed to get value' }), {
+    return new Response(JSON.stringify({
+      error: 'Failed to get value'
+    }), {
       status: 500,
       headers: responseHeaders,
     });

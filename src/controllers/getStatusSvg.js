@@ -26,10 +26,27 @@ function renderEmpty() {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0"></svg>`;
 }
 
+function resolveGlobalStatus(devices) {
+  let globalStatus = Status.OFFLINE;
+
+  for (const device of devices) {
+    const status = device?.s;
+
+    if (status === Status.ONLINE) {
+      return Status.ONLINE;
+    }
+    if (status === Status.AWAY) {
+      globalStatus = Status.AWAY;
+    }
+  }
+
+  return globalStatus;
+}
+
 export async function getStatusSvg(env, request, responseHeaders) {
   let svg;
-  try {
 
+  try {
     const url = new URL(request.url);
 
     const { valid, error, options = {} } = validateStatusSvgQuery(url.searchParams);
@@ -43,12 +60,25 @@ export async function getStatusSvg(env, request, responseHeaders) {
       });
     }
 
-    const status = await env.STATUSDOT_KV.get("status");
+    const list = await env.STATUSDOT_KV.list({ prefix: "status:" });
 
-    const result = status === null ? Status.OFFLINE : Number(status);
+    const devices = [];
 
-    const label = StatusLabels[result]
-    const color = StatusColors[result]
+    for (const key of list.keys) {
+      const keyContent = await env.STATUSDOT_KV.get(key.name);
+      if (!keyContent) {
+        continue;
+      }
+
+      devices.push(JSON.parse(keyContent));
+    }
+
+    const result = devices.length === 0
+      ? Status.OFFLINE
+      : resolveGlobalStatus(devices);
+
+    const label = StatusLabels[result];
+    const color = StatusColors[result];
 
     const statusSvg = new OnlineStatusSvg({
       statusText: label,
@@ -57,6 +87,7 @@ export async function getStatusSvg(env, request, responseHeaders) {
     });
 
     svg = statusSvg.render();
+
   } catch {
     svg = renderEmpty();
   }

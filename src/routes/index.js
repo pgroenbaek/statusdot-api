@@ -17,9 +17,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { getDeviceStatus } from '../controllers/getDeviceStatus.js';
 import { getStatus } from '../controllers/getStatus.js';
 import { getStatusSvg } from '../controllers/getStatusSvg.js';
-import { setStatus } from '../controllers/setStatus.js';
+import { setDeviceStatus } from '../controllers/setDeviceStatus.js';
 import { requireApiKey } from '../middlewares/auth.js';
 import { handleCors } from '../middlewares/cors.js';
 
@@ -28,42 +29,57 @@ export async function handleRequest(request, env) {
   const path = url.pathname;
 
   const cors = handleCors(env, request);
-  
+
   if (cors instanceof Response) {
     return cors;
   }
 
   const responseHeaders = cors;
 
-  switch (path) {
-    case '/api/status':
-      if (request.method === 'GET') {
-        return getStatus(env, request, responseHeaders);
-      }
-      if (request.method === 'POST') {
-        const authError = requireApiKey(env, request);
-        if (authError) {
-            return authError;
-        }
-        return setStatus(env, request, responseHeaders);
-      }
-      break;
+  // /api/status/:device
+  if (path.startsWith('/api/status/')) {
+    const device = path.slice('/api/status/'.length);
 
-    case '/api/status.svg':
-      if (request.method === 'GET') {
-        return getStatusSvg(env, request, responseHeaders);
+    if (request.method === 'GET') {
+      const authError = requireApiKey(env, request);
+      if (authError) {
+        return authError;
       }
-      break;
+      
+      return getDeviceStatus(env, request, responseHeaders, device);
+    }
 
-    default:
-      return new Response(JSON.stringify({ error: "Not Found" }), {
-        status: 404,
-        headers: { "Content-Type": "application/json" },
-      });
+    if (request.method === 'POST') {
+      const authError = requireApiKey(env, request);
+      if (authError) {
+        return authError;
+      }
+
+      return setDeviceStatus(env, request, responseHeaders, device);
+    }
+
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
-  return new Response(JSON.stringify({ error: "Method not allowed" }), {
-    status: 405,
+  // /api/status
+  if (path === '/api/status') {
+    if (request.method === 'GET') {
+      return getStatus(env, request, responseHeaders);
+    }
+  }
+
+  // /api/status.svg
+  if (path === '/api/status.svg') {
+    if (request.method === 'GET') {
+      return getStatusSvg(env, request, responseHeaders);
+    }
+  }
+
+  return new Response(JSON.stringify({ error: "Not Found" }), {
+    status: 404,
     headers: { "Content-Type": "application/json" },
   });
 }
