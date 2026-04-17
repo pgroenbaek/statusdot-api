@@ -35,7 +35,11 @@ function resolveGlobalStatus(devices) {
     if (status === Status.ONLINE) {
       return Status.ONLINE;
     }
-    if (status === Status.AWAY) {
+
+    if (status === Status.BUSY) {
+      globalStatus = Status.BUSY;
+    }
+    else if (status === Status.AWAY && globalStatus !== Status.BUSY) {
       globalStatus = Status.AWAY;
     }
   }
