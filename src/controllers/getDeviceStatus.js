@@ -30,7 +30,7 @@ export async function getDeviceStatus(env, request, responseHeaders, device) {
     if (keyContent === null) {
       result = {
         status: Status.OFFLINE,
-        updated_at: null
+        updated_at: 0
       };
     } else {
       const parsed = JSON.parse(keyContent);
