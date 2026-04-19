@@ -38,10 +38,11 @@ export async function setDeviceStatus(env, request, responseHeaders, device) {
     const key = `status:${device}`;
 
     const status = Number(payload.status);
+    const updatedAt = Date.now();
 
     const keyContent = {
       s: status,
-      u: Date.now()
+      u: updatedAt
     };
 
     await env.STATUSDOT_KV.put(key, JSON.stringify(keyContent), {
@@ -51,9 +52,9 @@ export async function setDeviceStatus(env, request, responseHeaders, device) {
     responseHeaders.set("Content-Type", "application/json");
 
     return new Response(JSON.stringify({
-      success: true,
       device,
-      status
+      status,
+      updated_at: updatedAt
     }), {
       status: 200,
       headers: responseHeaders,
