@@ -69,6 +69,11 @@ export async function handleRequest(request, env) {
     if (request.method === 'GET') {
       return getStatus(env, request, responseHeaders);
     }
+
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   // /api/status.svg
@@ -76,6 +81,11 @@ export async function handleRequest(request, env) {
     if (request.method === 'GET') {
       return getStatusSvg(env, request, responseHeaders);
     }
+
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   return new Response(JSON.stringify({ error: "Not Found" }), {
