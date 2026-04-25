@@ -49,7 +49,7 @@ export async function handleRequest(request, env) {
       return getDeviceStatus(env, request, responseHeaders, device);
     }
 
-    if (request.method === 'POST') {
+    if (request.method === 'PUT') {
       const authError = requireApiKey(env, request);
       if (authError) {
         return authError;
