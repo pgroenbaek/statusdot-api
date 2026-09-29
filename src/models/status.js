@@ -19,6 +19,9 @@
 
 export const DEFAULT_STATUS_EXPIRATION_SECONDS = 7 * 60;
 
+export const DEFAULT_SVG_BACKGROUND_COLOR = "grey";
+export const DEFAULT_SVG_STYLE = "flat";
+
 export const Status = Object.freeze({
   OFFLINE: 0,
   ONLINE: 1,
@@ -34,8 +37,8 @@ export const StatusColors = Object.freeze({
 });
 
 export const StatusLabels = Object.freeze({
-  [Status.OFFLINE]: "OFFLINE",
-  [Status.ONLINE]: "ONLINE",
-  [Status.AWAY]: "AWAY",
-  [Status.BUSY]: "BUSY",
+  [Status.OFFLINE]: "Offline",
+  [Status.ONLINE]: "Online",
+  [Status.AWAY]: "Away",
+  [Status.BUSY]: "Busy",
 });

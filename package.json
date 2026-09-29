@@ -12,6 +12,6 @@
   "author": "Peter Grønbæk Andersen",
   "license": "MIT",
   "dependencies": {
-    "online-status-svg": "^0.1.1"
+    "badge-maker": "^6.0.0"
   }
 }

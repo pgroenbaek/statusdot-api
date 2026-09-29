@@ -17,9 +17,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { OnlineStatusSvg } from 'online-status-svg';
+import { makeBadge } from 'badge-maker';
 import { Status } from '../models/status.js';
 import { StatusColors, StatusLabels } from '../models/status.js';
+import { DEFAULT_SVG_BACKGROUND_COLOR, DEFAULT_SVG_STYLE } from '../models/status.js';
+import { generateSvgDot } from '../utils/dot.js';
 import { validateStatusSvgQuery } from '../utils/validators.js';
 
 function renderEmpty() {
@@ -35,7 +37,7 @@ function resolveGlobalStatus(devices) {
     if (status === Status.ONLINE) {
       return Status.ONLINE;
     }
-
+    
     if (status === Status.BUSY) {
       globalStatus = Status.BUSY;
     }
@@ -52,8 +54,9 @@ export async function getStatusSvg(env, request, responseHeaders) {
 
   try {
     const url = new URL(request.url);
+    const query = url.searchParams;
 
-    const { valid, error, options = {} } = validateStatusSvgQuery(url.searchParams);
+    const { valid, error, options = {} } = validateStatusSvgQuery(query);
 
     if (!valid) {
       responseHeaders.set("Content-Type", "application/json");
@@ -81,16 +84,28 @@ export async function getStatusSvg(env, request, responseHeaders) {
       ? Status.OFFLINE
       : resolveGlobalStatus(devices);
 
-    const label = StatusLabels[result];
-    const color = StatusColors[result];
+    const dotColor = StatusColors[result];
+    const style = options.style ?? DEFAULT_SVG_STYLE;
+    const backgroundColor = options.backgroundColor ?? DEFAULT_SVG_BACKGROUND_COLOR;
 
-    const statusSvg = new OnlineStatusSvg({
-      statusText: label,
-      dotColor: color,
-      ...options
-    });
+    let label;
+    let svgDot;
+    if (style === "for-the-badge") {
+      label = StatusLabels[result].toUpperCase();
+      svgDot = generateSvgDot(dotColor, 5)
+    }
+    else {
+      label = StatusLabels[result];
+      svgDot = generateSvgDot(dotColor)
+    }
 
-    svg = statusSvg.render();
+    svg = makeBadge({
+      message: label,
+      color: backgroundColor,
+      labelColor: backgroundColor,
+      style: style,
+      logoBase64: svgDot,
+    })
 
   } catch {
     svg = renderEmpty();

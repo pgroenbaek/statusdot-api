@@ -18,9 +18,9 @@
  */
 
 import { Status } from '../models/status.js';
+import { DEFAULT_SVG_BACKGROUND_COLOR, DEFAULT_SVG_STYLE } from '../models/status.js';
 
-const FONT_WEIGHTS = ["bold", "normal"];
-const BACKGROUND_STYLES = ["none", "rectangular", "circular"];
+const STYLES = ["flat", "flat-square", "plastic", "for-the-badge"];
 
 const NAMED_COLORS = new Set([
   "aliceblue", "antiquewhite", "aqua", "aquamarine", "azure", "beige", "bisque", "black",
@@ -75,55 +75,17 @@ function isColorString(value) {
 export function validateStatusSvgQuery(query) {
   const options = {};
 
-  const numberFields = [
-    "dotStrokeWidth",
-    "textSpacing",
-    "backgroundStrokeWidth"
-  ];
-
-  const colorFields = [
-    "dotStrokeColor",
-    "textColor",
-    "backgroundColor",
-    "backgroundStrokeColor"
-  ];
-
-  for (const field of colorFields) {
-    const value = query.get(field);
-    if (value !== null) {
-      if (!isColorString(value)) {
-        return { valid: false, error: `The query parameter "${field}" must be a valid CSS color` };
-      }
-      options[field] = value;
-    }
+  const backgroundColor = query.get("backgroundColor") ?? DEFAULT_SVG_BACKGROUND_COLOR;
+  if (backgroundColor !== null && !isColorString(backgroundColor)) {
+    return { valid: false, error: `The query parameter "backgroundColor" must be a valid CSS color` };
   }
+  options.backgroundColor = backgroundColor;
 
-  for (const field of numberFields) {
-    const value = query.get(field);
-    if (value !== null) {
-      const number = Number(value);
-      if (Number.isNaN(number)) {
-        return { valid: false, error: `The query parameter "${field}" must be a number` };
-      }
-      options[field] = number;
-    }
+  const style = query.get("style") ?? DEFAULT_SVG_STYLE;
+  if (backgroundColor !== null && !STYLES.includes(style)) {
+    return { valid: false, error: `The query parameter "style" must be one of: ${STYLES.join(", ")}` };
   }
-
-  const fontWeight = query.get("textFontWeight");
-  if (fontWeight !== null) {
-    if (!FONT_WEIGHTS.includes(fontWeight)) {
-      return { valid: false, error: `The query parameter "textFontWeight" must be "bold" or "normal"` };
-    }
-    options.textFontWeight = fontWeight;
-  }
-
-  const backgroundStyle = query.get("backgroundStyle");
-  if (backgroundStyle !== null) {
-    if (!BACKGROUND_STYLES.includes(backgroundStyle)) {
-      return { valid: false, error: `The query parameter "backgroundStyle" must be one of: ${BACKGROUND_STYLES.join(", ")}` };
-    }
-    options.backgroundStyle = backgroundStyle;
-  }
+  options.style = style;
 
   return { valid: true, options };
 }
