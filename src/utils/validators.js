@@ -82,7 +82,7 @@ export function validateStatusSvgQuery(query) {
   options.backgroundColor = backgroundColor;
 
   const style = query.get("style") ?? DEFAULT_SVG_STYLE;
-  if (backgroundColor !== null && !STYLES.includes(style)) {
+  if (style !== null && !STYLES.includes(style)) {
     return { valid: false, error: `The query parameter "style" must be one of: ${STYLES.join(", ")}` };
   }
   options.style = style;
