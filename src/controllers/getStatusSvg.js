@@ -19,7 +19,7 @@
 
 import { makeBadge } from 'badge-maker';
 import { Status } from '../models/status.js';
-import { StatusColors, StatusLabels } from '../models/status.js';
+import { StatusDotColors, StatusLabelColors, StatusLabelTexts } from '../models/status.js';
 import { DEFAULT_SVG_BACKGROUND_COLOR, DEFAULT_SVG_STYLE } from '../models/status.js';
 import { generateSvgDot } from '../utils/dot.js';
 import { validateStatusSvgQuery } from '../utils/validators.js';
@@ -84,24 +84,27 @@ export async function getStatusSvg(env, request, responseHeaders) {
       ? Status.OFFLINE
       : resolveGlobalStatus(devices);
 
-    const dotColor = StatusColors[result];
+    const dotColor = StatusDotColors[result];
     const style = options.style ?? DEFAULT_SVG_STYLE;
     const backgroundColor = options.backgroundColor ?? DEFAULT_SVG_BACKGROUND_COLOR;
 
-    let label;
+    let labelColor;
+    let labelText;
     let svgDot;
     if (style === "for-the-badge") {
-      label = StatusLabels[result].toUpperCase();
+      labelColor = StatusLabelColors[result];
+      labelText = StatusLabelTexts[result].toUpperCase();
       svgDot = generateSvgDot(dotColor, 5)
     }
     else {
-      label = StatusLabels[result];
+      labelColor = StatusLabelColors[result];
+      labelText = StatusLabelTexts[result];
       svgDot = generateSvgDot(dotColor)
     }
 
     svg = makeBadge({
-      message: label,
-      color: backgroundColor,
+      message: labelText,
+      color: labelColor,
       labelColor: backgroundColor,
       style: style,
       logoBase64: svgDot,

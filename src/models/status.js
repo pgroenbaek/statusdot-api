@@ -19,7 +19,7 @@
 
 export const DEFAULT_STATUS_EXPIRATION_SECONDS = 7 * 60;
 
-export const DEFAULT_SVG_BACKGROUND_COLOR = "grey";
+export const DEFAULT_SVG_BACKGROUND_COLOR = "#555";
 export const DEFAULT_SVG_STYLE = "flat";
 
 export const Status = Object.freeze({
@@ -29,14 +29,21 @@ export const Status = Object.freeze({
   BUSY: 3,
 });
 
-export const StatusColors = Object.freeze({
-  [Status.OFFLINE]: "#FF0000",
-  [Status.ONLINE]: "#00FF00",
-  [Status.AWAY]: "#FFA500",
-  [Status.BUSY]: "#FF0000",
+export const StatusDotColors = Object.freeze({
+  [Status.OFFLINE]: "#FF6B6B",
+  [Status.ONLINE]: "#81E6A2",
+  [Status.AWAY]: "#FFE082",
+  [Status.BUSY]: "#FF6B6B",
 });
 
-export const StatusLabels = Object.freeze({
+export const StatusLabelColors = Object.freeze({
+  [Status.OFFLINE]: "#C7474D",
+  [Status.ONLINE]: "#32965F",
+  [Status.AWAY]: "#B58A22",
+  [Status.BUSY]: "#C7474D",
+});
+
+export const StatusLabelTexts = Object.freeze({
   [Status.OFFLINE]: "Offline",
   [Status.ONLINE]: "Online",
   [Status.AWAY]: "Away",
