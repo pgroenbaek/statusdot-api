@@ -18,68 +18,12 @@
  */
 
 import { Status } from '../models/status.js';
-import { DEFAULT_SVG_BACKGROUND_COLOR, DEFAULT_SVG_STYLE } from '../models/status.js';
+import { DEFAULT_SVG_STYLE } from '../models/status.js';
 
 const STYLES = ["flat", "flat-square", "plastic", "for-the-badge"];
 
-const NAMED_COLORS = new Set([
-  "aliceblue", "antiquewhite", "aqua", "aquamarine", "azure", "beige", "bisque", "black",
-  "blanchedalmond", "blue", "blueviolet", "brown", "burlywood", "cadetblue", "chartreuse",
-  "chocolate", "coral", "cornflowerblue", "cornsilk", "crimson", "cyan", "darkblue",
-  "darkcyan", "darkgoldenrod", "darkgray", "darkgreen", "darkgrey", "darkkhaki",
-  "darkmagenta", "darkolivegreen", "darkorange", "darkorchid", "darkred", "darksalmon",
-  "darkseagreen", "darkslateblue", "darkslategray", "darkslategrey", "darkturquoise",
-  "darkviolet", "deeppink", "deepskyblue", "dimgray", "dimgrey", "dodgerblue",
-  "firebrick", "floralwhite", "forestgreen", "fuchsia", "gainsboro", "ghostwhite",
-  "gold", "goldenrod", "gray", "green", "greenyellow", "grey", "honeydew", "hotpink",
-  "indianred", "indigo", "ivory", "khaki", "lavender", "lavenderblush", "lawngreen",
-  "lemonchiffon", "lightblue", "lightcoral", "lightcyan", "lightgoldenrodyellow",
-  "lightgray", "lightgreen", "lightgrey", "lightpink", "lightsalmon", "lightseagreen",
-  "lightskyblue", "lightslategray", "lightslategrey", "lightsteelblue", "lightyellow",
-  "lime", "limegreen", "linen", "magenta", "maroon", "mediumaquamarine", "mediumblue",
-  "mediumorchid", "mediumpurple", "mediumseagreen", "mediumslateblue",
-  "mediumspringgreen", "mediumturquoise", "mediumvioletred", "midnightblue",
-  "mintcream", "mistyrose", "moccasin", "navajowhite", "navy", "oldlace", "olive",
-  "olivedrab", "orange", "orangered", "orchid", "palegoldenrod", "palegreen",
-  "paleturquoise", "palevioletred", "papayawhip", "peachpuff", "peru", "pink",
-  "plum", "powderblue", "purple", "rebeccapurple", "red", "rosybrown", "royalblue",
-  "saddlebrown", "salmon", "sandybrown", "seagreen", "seashell", "sienna", "silver",
-  "skyblue", "slateblue", "slategray", "slategrey", "snow", "springgreen",
-  "steelblue", "tan", "teal", "thistle", "tomato", "turquoise", "violet",
-  "wheat", "white", "whitesmoke", "yellow", "yellowgreen"
-]);
-
-function isColorString(value) {
-  if (NAMED_COLORS.has(value)) {
-    return true;
-  }
-  if (/^#[0-9a-fA-F]{3,8}$/.test(value)) {
-    return true;
-  }
-  if (/^rgb\(.+\)$/.test(value)) {
-    return true;
-  }
-  if (/^rgba\(.+\)$/.test(value)) {
-    return true;
-  }
-  if (/^hsl\(.+\)$/.test(value)) {
-    return true;
-  }
-  if (/^hsla\(.+\)$/.test(value)) {
-    return true;
-  }
-
-  return false;
-}
-
 export function validateStatusSvgQuery(query) {
   const options = {};
-
-  const backgroundColor = query.get("backgroundColor") ?? DEFAULT_SVG_BACKGROUND_COLOR;
-  if (backgroundColor !== null && !isColorString(backgroundColor)) {
-    return { valid: false, error: `The query parameter "backgroundColor" must be a valid CSS color` };
-  }
-  options.backgroundColor = backgroundColor;
 
   const style = query.get("style") ?? DEFAULT_SVG_STYLE;
   if (style !== null && !STYLES.includes(style)) {

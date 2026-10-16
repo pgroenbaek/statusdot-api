@@ -86,7 +86,6 @@ export async function getStatusSvg(env, request, responseHeaders) {
 
     const dotColor = StatusDotColors[result];
     const style = options.style ?? DEFAULT_SVG_STYLE;
-    const backgroundColor = options.backgroundColor ?? DEFAULT_SVG_BACKGROUND_COLOR;
 
     let labelColor;
     let labelText;
@@ -105,7 +104,7 @@ export async function getStatusSvg(env, request, responseHeaders) {
     svg = makeBadge({
       message: labelText,
       color: labelColor,
-      labelColor: backgroundColor,
+      labelColor: DEFAULT_SVG_BACKGROUND_COLOR,
       style: style,
       logoBase64: svgDot,
     })
