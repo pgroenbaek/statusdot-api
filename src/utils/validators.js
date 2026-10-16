@@ -20,14 +20,14 @@
 import { Status } from '../models/status.js';
 import { DEFAULT_SVG_STYLE } from '../models/status.js';
 
-const STYLES = ["flat", "flat-square", "plastic", "for-the-badge"];
+const VALID_STYLES = ["flat", "flat-square", "plastic", "for-the-badge"];
 
 export function validateStatusSvgQuery(query) {
   const options = {};
 
   const style = query.get("style") ?? DEFAULT_SVG_STYLE;
-  if (style !== null && !STYLES.includes(style)) {
-    return { valid: false, error: `The query parameter "style" must be one of: ${STYLES.join(", ")}` };
+  if (style !== null && !VALID_STYLES.includes(style)) {
+    return { valid: false, error: `The query parameter "style" must be one of: ${VALID_STYLES.join(", ")}` };
   }
   options.style = style;
 
